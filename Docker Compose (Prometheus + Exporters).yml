@@ -1,0 +1,33 @@
+version: '3.9'
+
+services:
+
+  prometheus:
+    image: prom/prometheus
+    container_name: prometheus_epi
+    volumes:
+      - ./prometheus.yml:/etc/prometheus/prometheus.yml
+    ports:
+      - "9090:9090"
+
+  node-exporter:
+    image: prom/node-exporter
+    container_name: node_exporter_epi
+    ports:
+      - "9100:9100"
+
+  postgres-exporter:
+    image: prometheuscommunity/postgres-exporter
+    container_name: postgres_exporter_epi
+    environment:
+      DATA_SOURCE_NAME: "postgresql://postgres:password@postgres:5432/epidemiologie?sslmode=disable"
+    ports:
+      - "9187:9187"
+
+  kafka-exporter:
+    image: danielqsj/kafka-exporter
+    container_name: kafka_exporter_epi
+    command:
+      - '--kafka.server=kafka:9092'
+    ports:
+      - "9308:9308"

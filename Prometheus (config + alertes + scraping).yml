@@ -1,0 +1,76 @@
+############################################################
+# PROMETHEUS CONFIG + ALERTING (EPIDEMIOLOGIE)
+############################################################
+
+global:
+  scrape_interval: 5s
+  evaluation_interval: 5s
+
+rule_files:
+  - "alert_rules.yml"
+
+scrape_configs:
+
+  # API FastAPI
+  - job_name: 'api'
+    static_configs:
+      - targets: ['api:8000']
+
+  # PostgreSQL (via exporter)
+  - job_name: 'postgres'
+    static_configs:
+      - targets: ['postgres-exporter:9187']
+
+  # Kafka (via exporter)
+  - job_name: 'kafka'
+    static_configs:
+      - targets: ['kafka-exporter:9308']
+
+  # Node (CPU / RAM serveur)
+  - job_name: 'node'
+    static_configs:
+      - targets: ['node-exporter:9100']
+
+############################################################
+# ALERT RULES
+############################################################
+
+groups:
+- name: epidemiologie_alerts
+  rules:
+
+  - alert: PicEpidemique
+    expr: increase(cas_total[1m]) > 100
+    for: 10s
+    labels:
+      severity: critical
+    annotations:
+      summary: "Explosion des cas détectée"
+      description: "Augmentation rapide des cas"
+
+  - alert: TemperatureCritique
+    expr: temperature > 35
+    for: 10s
+    labels:
+      severity: warning
+    annotations:
+      summary: "Température élevée"
+      description: "Risque épidémiologique"
+
+  - alert: API_Down
+    expr: up{job="api"} == 0
+    for: 5s
+    labels:
+      severity: critical
+    annotations:
+      summary: "API indisponible"
+      description: "Service API DOWN"
+
+  - alert: HighCPU
+    expr: rate(node_cpu_seconds_total[1m]) > 0.9
+    for: 30s
+    labels:
+      severity: warning
+    annotations:
+      summary: "CPU élevé"
+      description: "Charge serveur élevée"

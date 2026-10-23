@@ -1,0 +1,41 @@
+{
+  "title": "Monitoring Epidemiologique Temps Reel",
+  "panels": [
+    {
+      "type": "timeseries",
+      "title": "Cas en temps réel",
+      "targets": [
+        {
+          "expr": "cas_total"
+        }
+      ]
+    },
+    {
+      "type": "timeseries",
+      "title": "Température",
+      "targets": [
+        {
+          "expr": "temperature"
+        }
+      ]
+    },
+    {
+      "type": "stat",
+      "title": "CPU Usage",
+      "targets": [
+        {
+          "expr": "rate(node_cpu_seconds_total[1m])"
+        }
+      ]
+    },
+    {
+      "type": "stat",
+      "title": "API Status",
+      "targets": [
+        {
+          "expr": "up{job=\"api\"}"
+        }
+      ]
+    }
+  ]
+}
